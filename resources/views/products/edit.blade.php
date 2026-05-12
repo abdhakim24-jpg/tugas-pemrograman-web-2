@@ -2,13 +2,30 @@
 
 @section('content')
 
-<h1>Edit Produk</h1>
+<h1>Edit Product</h1>
 
 <form action="{{ route('products.update', $product->id) }}"
       method="POST">
 
     @csrf
     @method('PUT')
+
+    <select name="category_id"
+            class="form-control mb-2">
+
+        @foreach ($categories as $category)
+
+        <option value="{{ $category->id }}"
+
+            {{ $product->category_id == $category->id ? 'selected' : '' }}>
+
+            {{ $category->name }}
+
+        </option>
+
+        @endforeach
+
+    </select>
 
     <input type="text"
            name="name"
@@ -18,11 +35,6 @@
     <input type="text"
            name="brand"
            value="{{ $product->brand }}"
-           class="form-control mb-2">
-
-    <input type="text"
-           name="category"
-           value="{{ $product->category }}"
            class="form-control mb-2">
 
     <input type="number"
