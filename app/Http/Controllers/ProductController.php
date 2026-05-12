@@ -3,45 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all();
+        $search = $request->search;
 
-        return view('products.index', compact('products'));
-    }
+        $category = $request->category;
 
-    public function create()
-    {
-        return view('products.create');
-    }
+        $products = Product::with('category')
 
-    public function store(Request $request)
-    {
-        Product::create($request->all());
+            ->when($search, function ($query) use ($search) {
 
-        return redirect()->route('products.index');
-    }
+                $query->where('name', 'like', '%' . $search . '%')
 
-    public function edit(Product $product)
-    {
-        return view('products.edit', compact('product'));
-    }
+                      ->orWhere('brand', 'like', '%' . $search . '%');
+            })
 
-    public function update(Request $request, Product $product)
-    {
-        $product->update($request->all());
+            ->when($category, function ($query) use ($category) {
 
-        return redirect()->route('products.index');
-    }
+                $query->where('category_id', $category);
+            })
 
-    public function destroy(Product $product)
-    {
-        $product->delete();
+            ->paginate(5);
 
-        return redirect()->route('products.index');
+        $categories = Category::all();
+
+        return view('products.index', compact(
+            'products',
+            'categories'
+        ));
     }
 }
