@@ -37,4 +37,18 @@ class ProductController extends Controller
             'categories'
         ));
     }
+
+    public function create()
+    {
+        $categories = Category::all();
+
+        return view('products.create', compact('categories'));
+    }
+
+    public function store(Request $request)
+    {
+        Product::create($request->all());
+
+        return redirect()->route('products.index');
+    }
 }
